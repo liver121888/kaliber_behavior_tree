@@ -12,37 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NAV2_BEHAVIOR_TREE__PLUGINS__CONDITION__IS_BATTERY_CHARGING_CONDITION_HPP_
-#define NAV2_BEHAVIOR_TREE__PLUGINS__CONDITION__IS_BATTERY_CHARGING_CONDITION_HPP_
+#ifndef NAV2_BEHAVIOR_TREE__PLUGINS__CONDITION__IS_SHOULD_RECOVERY_CONDITION_HPP_
+#define NAV2_BEHAVIOR_TREE__PLUGINS__CONDITION__IS_SHOULD_RECOVERY_CONDITION_HPP_
 
 #include <string>
 #include <memory>
 #include <mutex>
 
 #include "rclcpp/rclcpp.hpp"
-#include "sensor_msgs/msg/battery_state.hpp"
+#include "std_msgs/msg/bool.hpp"
 #include "behaviortree_cpp_v3/condition_node.h"
 
-namespace nav2_behavior_tree
+namespace kaliber_behavior_tree
 {
 
 /**
- * @brief A BT::ConditionNode that listens to a battery topic and
- * returns SUCCESS when battery is charging and FAILURE otherwise
+ * @brief A BT::ConditionNode that listens to a flag topic and
+ * returns SUCCESS when the flag is true and FAILURE otherwise
  */
-class IsBatteryChargingCondition : public BT::ConditionNode
+class IsShouldRecoveryCondition : public BT::ConditionNode
 {
 public:
   /**
-   * @brief A constructor for nav2_behavior_tree::IsBatteryChargingCondition
+   * @brief A constructor for kaliber_behavior_tree::IsShouldRecoveryCondition
    * @param condition_name Name for the XML tag for this node
    * @param conf BT node configuration
    */
-  IsBatteryChargingCondition(
+  IsShouldRecoveryCondition(
     const std::string & condition_name,
     const BT::NodeConfiguration & conf);
 
-  IsBatteryChargingCondition() = delete;
+  IsShouldRecoveryCondition() = delete;
 
   /**
    * @brief The main override required by a BT action
@@ -58,24 +58,24 @@ public:
   {
     return {
       BT::InputPort<std::string>(
-        "battery_topic", std::string("/battery_status"), "Battery topic")
+        "flag_topic", std::string("/should_recovery"), "Flag topic")
     };
   }
 
 private:
   /**
-   * @brief Callback function for battery topic
-   * @param msg Shared pointer to sensor_msgs::msg::BatteryState message
+   * @brief Callback function for flag topic
+   * @param msg Shared pointer to std_msgs::msg::Bool message
    */
-  void batteryCallback(sensor_msgs::msg::BatteryState::SharedPtr msg);
+  void flagCallback(std_msgs::msg::Bool::SharedPtr msg);
 
   rclcpp::CallbackGroup::SharedPtr callback_group_;
   rclcpp::executors::SingleThreadedExecutor callback_group_executor_;
-  rclcpp::Subscription<sensor_msgs::msg::BatteryState>::SharedPtr battery_sub_;
-  std::string battery_topic_;
-  bool is_battery_charging_;
+  rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr flag_sub_;
+  std::string flag_topic_;
+  bool is_should_recovery_;
 };
 
-}  // namespace nav2_behavior_tree
+}  // namespace kaliber_behavior_tree
 
-#endif  // NAV2_BEHAVIOR_TREE__PLUGINS__CONDITION__IS_BATTERY_CHARGING_CONDITION_HPP_
+#endif  // NAV2_BEHAVIOR_TREE__PLUGINS__CONDITION__IS_SHOULD_RECOVERY_CONDITION_HPP_

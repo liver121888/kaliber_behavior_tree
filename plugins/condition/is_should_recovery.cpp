@@ -14,19 +14,19 @@
 
 #include <string>
 
-#include "nav2_behavior_tree/plugins/condition/is_battery_charging_condition.hpp"
+#include "kaliber_behavior_tree/plugins/condition/is_should_recovery.hpp"
 
-namespace nav2_behavior_tree
+namespace kaliber_behavior_tree
 {
 
-IsBatteryChargingCondition::IsBatteryChargingCondition(
+IsShouldRecoveryCondition::IsShouldRecoveryCondition(
   const std::string & condition_name,
   const BT::NodeConfiguration & conf)
 : BT::ConditionNode(condition_name, conf),
-  battery_topic_("/battery_status"),
-  is_battery_charging_(false)
+  flag_topic_("/should_recovery"),
+  is_should_recovery_(false)
 {
-  getInput("battery_topic", battery_topic_);
+  getInput("flag_topic", flag_topic_);
   auto node = config().blackboard->get<rclcpp::Node::SharedPtr>("node");
   callback_group_ = node->create_callback_group(
     rclcpp::CallbackGroupType::MutuallyExclusive,
@@ -35,32 +35,31 @@ IsBatteryChargingCondition::IsBatteryChargingCondition(
 
   rclcpp::SubscriptionOptions sub_option;
   sub_option.callback_group = callback_group_;
-  battery_sub_ = node->create_subscription<sensor_msgs::msg::BatteryState>(
-    battery_topic_,
+  flag_sub_ = node->create_subscription<std_msgs::msg::Bool>(
+    flag_topic_,
     rclcpp::SystemDefaultsQoS(),
-    std::bind(&IsBatteryChargingCondition::batteryCallback, this, std::placeholders::_1),
+    std::bind(&IsShouldRecoveryCondition::flagCallback, this, std::placeholders::_1),
     sub_option);
 }
 
-BT::NodeStatus IsBatteryChargingCondition::tick()
+BT::NodeStatus IsShouldRecoveryCondition::tick()
 {
   callback_group_executor_.spin_some();
-  if (is_battery_charging_) {
+  if (is_should_recovery_) {
     return BT::NodeStatus::SUCCESS;
   }
   return BT::NodeStatus::FAILURE;
 }
 
-void IsBatteryChargingCondition::batteryCallback(sensor_msgs::msg::BatteryState::SharedPtr msg)
+void IsShouldRecoveryCondition::flagCallback(std_msgs::msg::Bool::SharedPtr msg)
 {
-  is_battery_charging_ =
-    (msg->power_supply_status == sensor_msgs::msg::BatteryState::POWER_SUPPLY_STATUS_CHARGING);
+  is_should_recovery_ = msg->data;
 }
 
-}  // namespace nav2_behavior_tree
+}  // namespace kaliber_behavior_tree
 
 #include "behaviortree_cpp_v3/bt_factory.h"
 BT_REGISTER_NODES(factory)
 {
-  factory.registerNodeType<nav2_behavior_tree::IsBatteryChargingCondition>("IsBatteryCharging");
+  factory.registerNodeType<kaliber_behavior_tree::IsShouldRecoveryCondition>("IsShouldRecovery");
 }

@@ -8,7 +8,7 @@ import os
 def generate_launch_description():
 
     # Find package share directory
-    pkg_q9_bt = get_package_share_directory('q9_bt')
+    pkg_kaliber_bt = get_package_share_directory('kaliber_behavior_tree')
 
     # Path to bt xml file
     # xml_file = os.path.join(pkg_q9_bt, 'bt_xml', 'q9_search.xml')
@@ -23,7 +23,8 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(tb3_sim_launch),
             launch_arguments={
-                'headless': 'False'  # override headless argument
+                'headless': 'False',  # override headless argument
+                'params_file': os.path.join(pkg_kaliber_bt, 'config', 'nav2_params.yaml')
             }.items()
         ),
         # Node(

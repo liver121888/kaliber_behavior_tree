@@ -67,15 +67,16 @@ install(TARGETS ${plugin_libs}
   RUNTIME DESTINATION bin
 )
 
-install(DIRECTORY
-  include/
-  config/
-  bt_xml/
-  launch/
-  DESTINATION ${CMAKE_INSTALL_PREFIX}
-)
+# install(DIRECTORY
+#   config/
+#   bt_xml/
+#   launch/
+#   DESTINATION share/${PROJECT_NAME}
+# )
 
-install(FILES kaliber_tree_nodes.xml DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY bt_xml launch config
+  DESTINATION share/${PROJECT_NAME}
+)
 
 ament_export_include_directories(
   include

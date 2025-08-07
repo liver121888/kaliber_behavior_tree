@@ -1,3 +1,48 @@
+# kaliber_behavior_tree
+
+We overwrite nav2_behavior_tree pkg with our custom nodes to achieve our goal.
+
+When editing with Groot, load the bt_xml/kaliber_tree_nodes.xml to palette first.
+
+When saving using Groot, switch evey ID to xml tag for bt_navigator to be able to read.
+
+Example:
+```
+<!-- From this format -->
+<Sequence>
+  <Condition ID="IsShouldRecovery" flag_topic="/should_recovery"/>
+  <Sequence name="RecoveryActions">
+      <Sequence name="ClearingActions">
+          <Action ID="ClearEntireCostmap" name="ClearLocalCostmap-Subtree" server_timeout="" service_name="local_costmap/clear_entirely_local_costmap"/>
+          <Action ID="ClearEntireCostmap" name="ClearGlobalCostmap-Subtree" server_timeout="" service_name="global_costmap/clear_entirely_global_costmap"/>
+      </Sequence>
+      <Action ID="Spin" server_name="" server_timeout="" spin_dist="1.57" time_allowance=""/>
+      <Action ID="Wait" server_name="" server_timeout="" wait_duration="5"/>
+      <Action ID="BackUp" backup_dist="0.30" backup_speed="0.05" server_name="" server_timeout="" time_allowance=""/>
+</Sequence>
+
+
+<!-- To this format -->
+<Sequence>
+  <IsShouldRecovery flag_topic="/should_recovery"/>
+  <Sequence name="RecoveryActions">
+      <Sequence name="ClearingActions">
+          <ClearEntireCostmap name="ClearLocalCostmap-Subtree"  server_timeout="" service_name="local_costmap/clear_entirely_local_costmap"/>
+          <ClearEntireCostmap name="ClearGlobalCostmap-Subtree"  server_timeout="" service_name="global_costmap/clear_entirely_global_costmap"/>
+      </Sequence>
+      <Spin server_name="" server_timeout="" spin_dist="1.57" time_allowance=""/>
+      <Wait server_name="" server_timeout="" wait_duration="5"/>
+      <BackUp backup_dist="0.30" backup_speed="0.05" server_name="" server_timeout="" time_allowance=""/>
+  </Sequence>
+</Sequence>
+```
+
+One command to launch it all
+```
+ros2 launch kaliber_behavior_tree kaliber_nav2_gazebo.launch.py
+# remember to set the initial pose in Rviz after launching
+```
+
 # nav2_behavior_tree
 
 This module is used by the nav2_bt_navigator to implement a ROS2 node that executes navigation Behavior Trees for either navigation or autonomy systems. The nav2_behavior_tree module uses the [Behavior-Tree.CPP library](https://github.com/BehaviorTree/BehaviorTree.CPP) for the core Behavior Tree processing.
